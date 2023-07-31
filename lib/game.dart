@@ -15,6 +15,17 @@ enum Event { battle, shop, treasure, none }
 
 enum Buff { invisible, mad, immortalityActivated }
 
+enum MapObject {
+  player,
+  enemy,
+  shop,
+  treasure,
+  preRunShop,
+  floorLadder,
+  dungeonEnterance,
+  none
+}
+
 class Game {
   Game({required this.context}) : player = PlayerData(context: context);
   final BuildContext context;

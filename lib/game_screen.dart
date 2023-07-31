@@ -32,7 +32,7 @@ class _GameScreenState extends State<GameScreen> {
     inputs.add(PlayerInputData(
         inputText: 'HAZIR',
         inputIcon: Icons.check_circle_outline_outlined,
-        inputAction: startGame));
+        inputAction: beginGame));
     inputs.add(PlayerInputData(
         inputText: 'MACERA ÖNCESİ DÜKKANI',
         inputIcon: Icons.shopping_cart_outlined,
@@ -203,7 +203,7 @@ class _GameScreenState extends State<GameScreen> {
           PlayerInputData(
             inputText: 'TEKRAR',
             inputIcon: Icons.fast_rewind_outlined,
-            inputAction: startGame,
+            inputAction: beginGame,
           ),
           PlayerInputData(
               inputText: 'DEVAM',
@@ -227,6 +227,12 @@ class _GameScreenState extends State<GameScreen> {
     });
   }
 
+  void setMapObject(List<int> cords, MapObject object) {
+    setState(() {
+      context.read<GameScreenProvider>().map[cords[0]][cords[1]] = object;
+    });
+  }
+
   void playerAttack() {
     setState(() {
       _game.playerAttack(battleOver);
@@ -236,27 +242,9 @@ class _GameScreenState extends State<GameScreen> {
     }
   }
 
-  void startGame() {
+  void beginGame() {
     setState(() {
-      _game.startGame();
-      if (!_game.affordsPreRunBuffes) {
-        return;
-      }
-
-      inputs = [
-        PlayerInputData(
-            inputText: 'SALDIR',
-            inputIcon: Icons.arrow_upward_outlined,
-            inputAction: playerAttack),
-        PlayerInputData(
-            inputText: 'KONTROL',
-            inputIcon: Icons.check_box_outlined,
-            inputAction: checkEnemy),
-        PlayerInputData(
-            inputText: 'KAÇ',
-            inputIcon: Icons.run_circle_outlined,
-            inputAction: playerEscape)
-      ];
+      context.read<GameScreenProvider>().setUpMap();
     });
   }
 
@@ -264,7 +252,7 @@ class _GameScreenState extends State<GameScreen> {
   Widget build(BuildContext context) {
     List<String> allMessages = context.watch<GameScreenProvider>().chatLog;
     // ignore: unused_local_variable
-    List<List<Event>> map = context.watch<GameScreenProvider>().map;
+    List<List<MapObject>> map = context.watch<GameScreenProvider>().map;
     List<Widget> botMessages = [];
     for (String message in allMessages) {
       botMessages.add(BotMessage(message: message));
@@ -278,22 +266,26 @@ class _GameScreenState extends State<GameScreen> {
                 child: GridView.count(
               crossAxisCount: 5,
               children: List.generate(25, (index) {
-                IconData? eventIcon;
+                IconData? mapIcon;
                 int row = index ~/ 5;
                 int col = index % 5;
 
-                eventIcon = Icons.abc;
+                mapIcon = Icons.abc;
 
-                if (map[col][row] == Event.none) {
-                  eventIcon = null;
-                } else if (map[col][row] == Event.battle) {
-                  eventIcon = Icons.dangerous;
+                if (map[col][row] == MapObject.none) {
+                  mapIcon = null;
+                } else if (map[col][row] == MapObject.enemy) {
+                  mapIcon = Icons.dangerous;
+                } else if (map[col][row] == MapObject.player) {
+                  mapIcon = Icons.arrow_downward_outlined;
+                } else if (map[col][row] == MapObject.dungeonEnterance) {
+                  mapIcon = Icons.door_sliding_outlined;
                 }
 
                 return Container(
                   decoration: BoxDecoration(border: Border.all()),
                   child: Center(
-                    child: Icon(eventIcon),
+                    child: Icon(mapIcon),
                   ),
                 );
               }),

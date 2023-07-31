@@ -7,14 +7,14 @@ class GameScreenProvider with ChangeNotifier {
     'Selam! Ben SUGOMABOT v3.0\'ım ve sen HAZIR olunca başlayalım.'
   ];
   // ignore: prefer_final_fields
-  List<List<Event>> _gameMap = [];
+  List<List<MapObject>> _gameMap = [];
   bool _isFreeplay = false;
 
   void setUpMap() {
     for (var x = 0; x < 5; x++) {
-      List<Event> row = [];
+      List<MapObject> row = [];
       for (var y = 0; y < 5; y++) {
-        row.add(Event.none);
+        row.add(MapObject.none);
       }
       _gameMap.add(row);
     }
@@ -36,7 +36,7 @@ class GameScreenProvider with ChangeNotifier {
     _isFreeplay = true;
   }
 
-  List<List<Event>> get map => _gameMap;
+  List<List<MapObject>> get map => _gameMap;
   List<String> get chatLog => _messages;
   bool get isFreeplay => _isFreeplay;
 }
