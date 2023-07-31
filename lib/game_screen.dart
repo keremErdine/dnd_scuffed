@@ -245,6 +245,9 @@ class _GameScreenState extends State<GameScreen> {
   void beginGame() {
     setState(() {
       context.read<GameScreenProvider>().setUpMap();
+      setMapObject([4, 2], MapObject.player);
+      setMapObject([0, 2], MapObject.dungeonEnterance);
+      setMapObject([3, 2], MapObject.preRunShop);
     });
   }
 
