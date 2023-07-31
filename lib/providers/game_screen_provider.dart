@@ -14,8 +14,7 @@ class GameScreenProvider with ChangeNotifier {
     for (var x = 0; x < 5; x++) {
       List<Event> row = [];
       for (var y = 0; y < 5; y++) {
-        row.add(Event.battle);
-        debugPrint('!!!!!');
+        row.add(Event.none);
       }
       _gameMap.add(row);
     }

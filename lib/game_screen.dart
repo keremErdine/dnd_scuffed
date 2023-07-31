@@ -283,7 +283,6 @@ class _GameScreenState extends State<GameScreen> {
                 int col = index % 5;
 
                 eventIcon = Icons.abc;
-                debugPrint(map[col][row].toString());
 
                 if (map[col][row] == Event.none) {
                   eventIcon = null;
