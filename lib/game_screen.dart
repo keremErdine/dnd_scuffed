@@ -75,7 +75,7 @@ class _GameScreenState extends State<GameScreen> {
     inShop();
   }
 
-  void spawnShop() {
+  void spawnShop(List<int> cords) {
     setState(() {
       _game.spawnShop();
       inputs.insert(
@@ -84,6 +84,17 @@ class _GameScreenState extends State<GameScreen> {
               inputText: 'GİR',
               inputIcon: Icons.exit_to_app_outlined,
               inputAction: enterShop));
+      inputs.insert(
+          0,
+          PlayerInputData(
+              inputText: 'DEVAM',
+              inputIcon: Icons.arrow_right_alt_outlined,
+              inputAction: () {
+                setState(() {
+                  setMapObject(cords, MapObject.none);
+                  inputs.clear();
+                });
+              }));
     });
   }
 
@@ -94,7 +105,7 @@ class _GameScreenState extends State<GameScreen> {
     });
   }
 
-  void spawnTreasure() {
+  void spawnTreasure(List<int> treasureCords) {
     setState(() {
       _game.spawnChest();
       inputs.insert(
@@ -111,6 +122,17 @@ class _GameScreenState extends State<GameScreen> {
                           treasure: _game.currentTreasure!,
                           player: _game.player,
                         ));
+              }));
+      inputs.insert(
+          1,
+          PlayerInputData(
+              inputText: 'DEVAM',
+              inputIcon: Icons.arrow_right_alt_outlined,
+              inputAction: () {
+                setState(() {
+                  setMapObject(treasureCords, MapObject.none);
+                  inputs.clear();
+                });
               }));
     });
   }
@@ -129,28 +151,30 @@ class _GameScreenState extends State<GameScreen> {
     if (_game.currentEvent == Event.battle) {
       spawnEnemy();
     } else if (_game.currentEvent == Event.shop) {
-      spawnShop();
+      spawnShop([0, 0]);
     } else if (_game.currentEvent == Event.treasure) {
-      spawnTreasure();
+      spawnTreasure([0, 0]);
     }
   }
 
   void spawnEnemy() {
-    _game.spawnEnemy();
-    inputs = [
-      PlayerInputData(
-          inputText: 'SALDIR',
-          inputIcon: Icons.arrow_upward_outlined,
-          inputAction: playerAttack),
-      PlayerInputData(
-          inputText: 'KONTROL',
-          inputIcon: Icons.check_box_outlined,
-          inputAction: checkEnemy),
-      PlayerInputData(
-          inputText: 'KAÇ',
-          inputIcon: Icons.run_circle_outlined,
-          inputAction: playerEscape)
-    ];
+    setState(() {
+      _game.spawnEnemy();
+      inputs = [
+        PlayerInputData(
+            inputText: 'SALDIR',
+            inputIcon: Icons.arrow_upward_outlined,
+            inputAction: playerAttack),
+        PlayerInputData(
+            inputText: 'KONTROL',
+            inputIcon: Icons.check_box_outlined,
+            inputAction: checkEnemy),
+        PlayerInputData(
+            inputText: 'KAÇ',
+            inputIcon: Icons.run_circle_outlined,
+            inputAction: playerEscape)
+      ];
+    });
   }
 
   void checkEnemy() {
@@ -159,12 +183,9 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void battleOver() {
-    inputs = [
-      PlayerInputData(
-          inputText: 'DEVAM',
-          inputIcon: Icons.forward_rounded,
-          inputAction: continueGame)
-    ];
+    inputs = [];
+    setMapObject(_game.currentEnemyCords!, MapObject.none);
+    _game.currentEnemyCords = null;
   }
 
   void playerEscape() {
@@ -184,24 +205,26 @@ class _GameScreenState extends State<GameScreen> {
     int stores = 0;
     int treasures = 0;
 
+    context.read<GameScreenProvider>().addMessage('KAT $floor...');
     setState(() {
       List<int> currentCords = [0, 0];
 
       for (var element in map) {
         // ignore: unused_local_variable
         for (var square in element) {
-          int randomNumber = randomizer.nextInt(5);
-          if (randomNumber == 0) {
+          int randomNumber = randomizer.nextInt(6);
+          if (randomNumber == 0 || randomNumber == 1) {
             setMapObject([currentCords[0], currentCords[1]], MapObject.enemy);
-          } else if ((randomNumber == 1 || currentCords == [4, 4]) &&
+          } else if ((randomNumber == 2 || currentCords == [4, 4]) &&
               !exitBuilt &&
               currentCords != [4, 2]) {
             setMapObject(
                 [currentCords[0], currentCords[1]], MapObject.floorLadder);
-          } else if (randomNumber == 2 && !(stores >= 3)) {
+            exitBuilt = true;
+          } else if (randomNumber == 3 && !(stores >= 3)) {
             stores++;
             setMapObject([currentCords[0], currentCords[1]], MapObject.shop);
-          } else if (randomNumber == 3 && !(treasures >= 3)) {
+          } else if (randomNumber == 4 && !(treasures >= 3)) {
             treasures++;
             setMapObject(
                 [currentCords[0], currentCords[1]], MapObject.treasure);
@@ -227,15 +250,6 @@ class _GameScreenState extends State<GameScreen> {
         _game.player.hunger = _game.player.maxHunger;
       } else if (_game.player.health <= 0) {
         inputs = [
-          PlayerInputData(
-              inputText: 'MACERA ÖNCESİ DÜKKANI',
-              inputIcon: Icons.shopping_cart_outlined,
-              inputAction: () {
-                showModalBottomSheet(
-                    context: context,
-                    builder: (ctx) => PreRunShopScreen(
-                        game: _game, stateSetter: emptyStateSetter));
-              }),
           PlayerInputData(
             inputText: 'TEKRAR',
             inputIcon: Icons.fast_rewind_outlined,
@@ -276,9 +290,10 @@ class _GameScreenState extends State<GameScreen> {
   void attemptMove(List<int> cords) {
     // col, row
     var map = Provider.of<GameScreenProvider>(context, listen: false).map;
-    if (playerCords[0] + 1 == cords[0] ||
-        playerCords[0] - 1 == cords[0] ||
-        playerCords[0] == cords[0]) {
+    if ((playerCords[0] + 1 == cords[0] ||
+            playerCords[0] - 1 == cords[0] ||
+            playerCords[0] == cords[0]) &&
+        !_game.enemyAlive) {
       if (playerCords[1] + 1 == cords[1] ||
           playerCords[1] - 1 == cords[1] ||
           playerCords[1] == cords[1]) {
@@ -292,23 +307,20 @@ class _GameScreenState extends State<GameScreen> {
                   PreRunShopScreen(game: _game, stateSetter: emptyStateSetter));
         } else if (map[cords[0]][cords[1]] == MapObject.dungeonEnterance) {
           setState(() {
-            enterFloor(1, map);
+            _game.currentFloor = 1;
+            enterFloor(_game.currentFloor, map);
             _game.startGame();
-            inputs = [
-              PlayerInputData(
-                  inputText: 'SALDIR',
-                  inputIcon: Icons.arrow_upward_outlined,
-                  inputAction: playerAttack),
-              PlayerInputData(
-                  inputText: 'KONTROL',
-                  inputIcon: Icons.check_box_outlined,
-                  inputAction: checkEnemy),
-              PlayerInputData(
-                  inputText: 'KAÇ',
-                  inputIcon: Icons.run_circle_outlined,
-                  inputAction: playerEscape)
-            ];
           });
+        } else if (map[cords[0]][cords[1]] == MapObject.enemy) {
+          _game.currentEnemyCords = [cords[0], cords[1]];
+          spawnEnemy();
+        } else if (map[cords[0]][cords[1]] == MapObject.treasure) {
+          spawnTreasure([cords[0], cords[1]]);
+        } else if (map[cords[0]][cords[1]] == MapObject.shop) {
+          spawnShop([cords[0], cords[1]]);
+        } else if (map[cords[0]][cords[1]] == MapObject.floorLadder) {
+          _game.currentFloor++;
+          enterFloor(_game.currentFloor, map);
         }
       }
     }
@@ -366,6 +378,12 @@ class _GameScreenState extends State<GameScreen> {
                   mapIcon = Icons.door_sliding_outlined;
                 } else if (map[col][row] == MapObject.preRunShop) {
                   mapIcon = Icons.shopping_cart_outlined;
+                } else if (map[col][row] == MapObject.shop) {
+                  mapIcon = Icons.store;
+                } else if (map[col][row] == MapObject.floorLadder) {
+                  mapIcon = Icons.keyboard_double_arrow_up_sharp;
+                } else if (map[col][row] == MapObject.treasure) {
+                  mapIcon = Icons.diamond_outlined;
                 }
 
                 return Container(

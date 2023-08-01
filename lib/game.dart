@@ -33,6 +33,7 @@ class Game {
 
   //SharedPreferences? prefs;
 
+  int currentFloor = 0;
   List<AllPreRunBuffes> activePreRunBuffs = [];
   bool enemyAlive = false;
   EnemyData? currentEnemyData;
@@ -47,6 +48,7 @@ class Game {
   int gems = 0;
   var daysSurvivedIcon = Icons.calendar_month_outlined;
   bool affordsPreRunBuffes = false;
+  List<int>? currentEnemyCords;
 
   /*
   void setSharedPreferances() async {
@@ -151,7 +153,7 @@ class Game {
     List<EnemyIDs> allEnemies = List<EnemyIDs>.from(EnemyIDs.values);
     List<EnemyIDs> availableEnemies = [];
     for (var enemyID in allEnemies) {
-      if (enemies[enemyID]!.enemyLevel <= player.level) {
+      if (enemies[enemyID]!.enemyLevel <= currentFloor) {
         availableEnemies.add(enemyID);
       }
     }
@@ -353,12 +355,9 @@ class Game {
       player.setLevel(3);
     }
     activePreRunBuffs.clear();
-    addMessage('Tamam. Önüne bir goblin çıktı.');
-    currentEnemyData = EnemyData(currentEnemyID: EnemyIDs.goblin);
-    currentEnemyData!.initializeEnemy();
-    currentEvent = Event.battle;
-    enemyAlive = true;
-    currentTurn = Turn.player;
+    currentEvent = Event.none;
+    enemyAlive = false;
+    currentTurn = Turn.none;
     isFreeplay = false;
     daysSurvivedIcon = Icons.calendar_month_outlined;
   }

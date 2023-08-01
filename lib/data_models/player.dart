@@ -136,13 +136,14 @@ class PlayerData {
         deathCount++;
 
         if (!context.read<GameScreenProvider>().isFreeplay) {
-          addGameMessage('$daysSurvived gün dayandın...');
-          int gemsEarned = daysSurvived ~/ 5;
+          addGameMessage(
+              '$daysSurvived gün dayandın ve ${game.currentFloor} kata çıktın...');
+          int gemsEarned = game.currentFloor;
           game.gems += gemsEarned;
           //game.saveGems();
           addGameMessage('Bu maceradan $gemsEarned değerli taş kazandın.');
           addGameMessage(
-              'Devam etmek ister misin? Bu hayatta kalınan günlerini donduracaktır.');
+              'Devam etmek ister misin? Bu hayatta kalınan günlerini ve kat sayını donduracaktır.');
         } else {
           addGameMessage('Bu macerada $deathCount kere yenildin...');
           addGameMessage(

@@ -57,6 +57,9 @@ class StatusIndicatorsBar extends StatelessWidget {
               StatusIndicator(
                   statusIcon: game.daysSurvivedIcon,
                   statusValue: player.daysSurvived),
+              StatusIndicator(
+                  statusIcon: Icons.stacked_bar_chart_outlined,
+                  statusValue: game.currentFloor)
             ],
           ),
         ],
