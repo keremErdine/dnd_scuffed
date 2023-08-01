@@ -38,7 +38,7 @@ class PlayerData {
     ItemIDs.goldKey: 0,
     ItemIDs.diamondKey: 0,
     ItemIDs.ancientKey: 0,
-    ItemIDs.doubleEdgesHorn: 0
+    ItemIDs.doubleEdgedHorn: 0
   };
 
   void revivePlayer() {

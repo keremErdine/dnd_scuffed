@@ -148,12 +148,11 @@ class Game {
   }
 
   void spawnEnemy() {
-    metShop = false;
-    metTreasure = false;
     List<EnemyIDs> allEnemies = List<EnemyIDs>.from(EnemyIDs.values);
     List<EnemyIDs> availableEnemies = [];
     for (var enemyID in allEnemies) {
-      if (enemies[enemyID]!.enemyLevel <= currentFloor) {
+      if (enemies[enemyID]!.enemyLevel <= currentFloor &&
+          enemies[enemyID]!.type != EnemyType.floorBoss) {
         availableEnemies.add(enemyID);
       }
     }
@@ -296,6 +295,10 @@ class Game {
           addMessage(
               'Gün biterken karşındaki ${currentEnemyData!.enemyName}, yerde cansız bir halde yatıyor...');
         }
+        if (currentEnemyData!.enemyType == EnemyType.floorBoss) {
+          addMessage(
+              'Başardın! Kat patronu ${currentEnemyData!.enemyName} yenildi ve sonraki kata giden yol açıldı!');
+        }
 
         enemyAlive = false;
         currentTurn = Turn.none;
@@ -305,12 +308,20 @@ class Game {
         addMessage(
             '${currentEnemyData!.enemyName} YENİLDI! Bu sayede $xpEarn deneyim ve $goldEarn altın kazandın!');
         if (randomizer.nextInt(100) < 15 &&
-            enemies[currentEnemyData!.currentEnemyID]!.drops.isNotEmpty) {
+            enemies[currentEnemyData!.currentEnemyID]!.drops.isNotEmpty &&
+            currentEnemyData!.enemyType != EnemyType.floorBoss) {
           ItemIDs gotItem = enemies[currentEnemyData!.currentEnemyID]!.drops[
               randomizer.nextInt(
                   enemies[currentEnemyData!.currentEnemyID]!.drops.length)];
           player.inventory[gotItem] = player.inventory[gotItem]! + 1;
           addMessage('Rakibinin üstünde bir ${items[gotItem]!.name} buldun!');
+        } else if (currentEnemyData!.enemyType == EnemyType.floorBoss) {
+          addMessage(
+              'Bu yaratığın üstünde ${enemies[currentEnemyData!.currentEnemyID]!.drops[0]} buldun!');
+          player.inventory[enemies[currentEnemyData!.currentEnemyID]!
+              .drops[0]] = player.inventory[
+                  enemies[currentEnemyData!.currentEnemyID]!.drops[0]]! +
+              1;
         }
         player.gold += goldEarn;
         player.xp += xpEarn;

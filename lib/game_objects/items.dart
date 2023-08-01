@@ -29,7 +29,7 @@ enum ItemIDs {
   goldKey,
   diamondKey,
   ancientKey,
-  doubleEdgesHorn
+  doubleEdgedHorn
 }
 
 Map<ItemIDs, Item> items = {
@@ -173,10 +173,10 @@ Map<ItemIDs, Item> items = {
           game.player.inventory[ItemIDs.ancientKey]! + 1;
     },
   ),
-  ItemIDs.doubleEdgesHorn: Item(
+  ItemIDs.doubleEdgedHorn: Item(
       name: 'Çift Uçlu Boynuz',
       description:
           'Saldırı hasarını ve kullanılan açlığı bir turluğuna iki katına çıkar. Dikkatli kullan',
       itemAction: (game) {},
-      itemID: ItemIDs.doubleEdgesHorn)
+      itemID: ItemIDs.doubleEdgedHorn)
 };

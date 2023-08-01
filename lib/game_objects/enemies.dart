@@ -15,7 +15,7 @@ class Enemy {
   final List<ItemIDs> drops;
 }
 
-enum EnemyType { normal, boss, special }
+enum EnemyType { normal, boss, floorBoss }
 
 enum EnemyIDs { goblin, wolf, zombie, earthGolem, undeadKnight, windigo }
 
@@ -54,7 +54,8 @@ Map<EnemyIDs, Enemy> enemies = {
   EnemyIDs.windigo: Enemy(
       enemyName: 'Wendigo',
       enemyLevel: 10,
-      enemyDescription: 'Ağaçların arasından çıkan bir yaratık.',
-      type: EnemyType.special,
-      drops: [ItemIDs.doubleEdgesHorn])
+      enemyDescription:
+          'Ağaçların arasından çıkan ve insan yiyen bir yaratık. Sonraki kata geçmek için öldür.',
+      type: EnemyType.floorBoss,
+      drops: [ItemIDs.doubleEdgedHorn])
 };

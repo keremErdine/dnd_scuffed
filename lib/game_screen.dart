@@ -3,6 +3,7 @@ import 'dart:js_interop';
 import 'package:dnd_scuffed/data_models/enemy_data.dart';
 import 'package:dnd_scuffed/data_models/player_input_data.dart';
 import 'package:dnd_scuffed/game.dart';
+import 'package:dnd_scuffed/game_objects/enemies.dart';
 import 'package:dnd_scuffed/main.dart';
 import 'package:dnd_scuffed/providers/game_screen_provider.dart';
 import 'package:dnd_scuffed/widgets/open_chest_screen.dart';
@@ -186,6 +187,9 @@ class _GameScreenState extends State<GameScreen> {
     inputs = [];
     setMapObject(_game.currentEnemyCords!, MapObject.none);
     _game.currentEnemyCords = null;
+    if (_game.currentEnemyData!.enemyType == EnemyType.floorBoss) {
+      enterFloor(_game.currentFloor, context.read<GameScreenProvider>().map);
+    }
   }
 
   void playerEscape() {
@@ -200,46 +204,77 @@ class _GameScreenState extends State<GameScreen> {
     });
   }
 
-  void enterFloor(int floor, List<List<MapObject>> map) {
-    bool exitBuilt = false;
-    int stores = 0;
-    int treasures = 0;
-
-    context.read<GameScreenProvider>().addMessage('KAT $floor...');
+  void summonFloorBoss(EnemyIDs bossId) {
+    _game.currentEnemyData = EnemyData(currentEnemyID: bossId);
+    _game.currentEnemyData!.initializeEnemy();
+    _game.currentTurn = Turn.player;
+    _game.enemyAlive = true;
     setState(() {
-      List<int> currentCords = [0, 0];
-
-      for (var element in map) {
-        // ignore: unused_local_variable
-        for (var square in element) {
-          int randomNumber = randomizer.nextInt(6);
-          if (randomNumber == 0 || randomNumber == 1) {
-            setMapObject([currentCords[0], currentCords[1]], MapObject.enemy);
-          } else if ((randomNumber == 2 || currentCords == [4, 4]) &&
-              !exitBuilt &&
-              currentCords != [4, 2]) {
-            setMapObject(
-                [currentCords[0], currentCords[1]], MapObject.floorLadder);
-            exitBuilt = true;
-          } else if (randomNumber == 3 && !(stores >= 3)) {
-            stores++;
-            setMapObject([currentCords[0], currentCords[1]], MapObject.shop);
-          } else if (randomNumber == 4 && !(treasures >= 3)) {
-            treasures++;
-            setMapObject(
-                [currentCords[0], currentCords[1]], MapObject.treasure);
-          } else {
-            setMapObject([currentCords[0], currentCords[1]], MapObject.none);
-          }
-          currentCords[1]++;
-        }
-        currentCords[0]++;
-
-        currentCords[1] = 0;
-      }
-      setMapObject([4, 2], MapObject.player);
-      playerCords = [4, 2];
+      inputs = [
+        PlayerInputData(
+            inputText: 'SALDIR',
+            inputIcon: Icons.arrow_upward_outlined,
+            inputAction: playerAttack),
+        PlayerInputData(
+            inputText: 'KONTROL',
+            inputIcon: Icons.check_box_outlined,
+            inputAction: checkEnemy),
+        PlayerInputData(
+            inputText: 'KAÇ',
+            inputIcon: Icons.run_circle_outlined,
+            inputAction: playerEscape)
+      ];
     });
+  }
+
+  void enterFloor(int floor, List<List<MapObject>> map) {
+    if (floor == 10) {
+      _game.addMessage('Bir yaratık yaklaşıyor! Dikkat et!');
+      summonFloorBoss(EnemyIDs.windigo);
+      _game.addMessage(
+          'EYVAH! Bu bir WENDİGO, insanları öldürüp onları yiyen orman yaratığı! ÇABUK ÖLDÜR ONU!');
+    }
+    if (!_game.enemyAlive) {
+      bool exitBuilt = false;
+      int stores = 0;
+      int treasures = 0;
+
+      context.read<GameScreenProvider>().addMessage('KAT $floor...');
+      setState(() {
+        List<int> currentCords = [0, 0];
+
+        for (var element in map) {
+          // ignore: unused_local_variable
+          for (var square in element) {
+            int randomNumber = randomizer.nextInt(6);
+            if (randomNumber == 0 || randomNumber == 1) {
+              setMapObject([currentCords[0], currentCords[1]], MapObject.enemy);
+            } else if ((randomNumber == 2 || currentCords == [4, 4]) &&
+                !exitBuilt &&
+                currentCords != [4, 2]) {
+              setMapObject(
+                  [currentCords[0], currentCords[1]], MapObject.floorLadder);
+              exitBuilt = true;
+            } else if (randomNumber == 3 && !(stores >= 3)) {
+              stores++;
+              setMapObject([currentCords[0], currentCords[1]], MapObject.shop);
+            } else if (randomNumber == 4 && !(treasures >= 3)) {
+              treasures++;
+              setMapObject(
+                  [currentCords[0], currentCords[1]], MapObject.treasure);
+            } else {
+              setMapObject([currentCords[0], currentCords[1]], MapObject.none);
+            }
+            currentCords[1]++;
+          }
+          currentCords[0]++;
+
+          currentCords[1] = 0;
+        }
+        setMapObject([4, 2], MapObject.player);
+        playerCords = [4, 2];
+      });
+    }
   }
 
   void enemyAttack() {
