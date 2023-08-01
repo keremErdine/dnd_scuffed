@@ -6,8 +6,7 @@ class GameScreenProvider with ChangeNotifier {
   final List<String> _messages = [
     'Selam! Ben SUGOMABOT v3.0\'ım ve sen HAZIR olunca başlayalım.'
   ];
-  // ignore: prefer_final_fields
-  List<List<MapObject>> _gameMap = [];
+  final List<List<MapObject>> _gameMap = [];
   bool _isFreeplay = false;
 
   void setUpMap() {
