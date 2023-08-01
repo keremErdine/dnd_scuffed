@@ -1,3 +1,6 @@
+import 'dart:js_interop';
+
+import 'package:dnd_scuffed/data_models/enemy_data.dart';
 import 'package:dnd_scuffed/data_models/player_input_data.dart';
 import 'package:dnd_scuffed/game.dart';
 import 'package:dnd_scuffed/main.dart';
@@ -22,6 +25,8 @@ class GameScreen extends StatefulWidget {
 class _GameScreenState extends State<GameScreen> {
   late Game _game;
   List<PlayerInputData> inputs = [];
+  late List<int> playerCords;
+  //col, row
 
   @override
   void initState() {
@@ -33,15 +38,6 @@ class _GameScreenState extends State<GameScreen> {
         inputText: 'HAZIR',
         inputIcon: Icons.check_circle_outline_outlined,
         inputAction: beginGame));
-    inputs.add(PlayerInputData(
-        inputText: 'MACERA ÖNCESİ DÜKKANI',
-        inputIcon: Icons.shopping_cart_outlined,
-        inputAction: () {
-          showModalBottomSheet(
-              context: context,
-              builder: (ctx) =>
-                  PreRunShopScreen(game: _game, stateSetter: emptyStateSetter));
-        }));
   }
 
   void inShop() {
@@ -183,6 +179,46 @@ class _GameScreenState extends State<GameScreen> {
     });
   }
 
+  void enterFloor(int floor, List<List<MapObject>> map) {
+    bool exitBuilt = false;
+    int stores = 0;
+    int treasures = 0;
+
+    setState(() {
+      List<int> currentCords = [0, 0];
+
+      for (var element in map) {
+        // ignore: unused_local_variable
+        for (var square in element) {
+          int randomNumber = randomizer.nextInt(5);
+          if (randomNumber == 0) {
+            setMapObject([currentCords[0], currentCords[1]], MapObject.enemy);
+          } else if ((randomNumber == 1 || currentCords == [4, 4]) &&
+              !exitBuilt &&
+              currentCords != [4, 2]) {
+            setMapObject(
+                [currentCords[0], currentCords[1]], MapObject.floorLadder);
+          } else if (randomNumber == 2 && !(stores >= 3)) {
+            stores++;
+            setMapObject([currentCords[0], currentCords[1]], MapObject.shop);
+          } else if (randomNumber == 3 && !(treasures >= 3)) {
+            treasures++;
+            setMapObject(
+                [currentCords[0], currentCords[1]], MapObject.treasure);
+          } else {
+            setMapObject([currentCords[0], currentCords[1]], MapObject.none);
+          }
+          currentCords[1]++;
+        }
+        currentCords[0]++;
+
+        currentCords[1] = 0;
+      }
+      setMapObject([4, 2], MapObject.player);
+      playerCords = [4, 2];
+    });
+  }
+
   void enemyAttack() {
     setState(() {
       _game.enemyAttack();
@@ -227,10 +263,55 @@ class _GameScreenState extends State<GameScreen> {
     });
   }
 
-  void setMapObject(List<int> cords, MapObject object) {
+  void setMapObject(List<int> cords, MapObject object, {List<int>? oldCords}) {
     setState(() {
+      if (!oldCords.isNull) {
+        context.read<GameScreenProvider>().map[oldCords![0]][oldCords[1]] =
+            MapObject.none;
+      }
       context.read<GameScreenProvider>().map[cords[0]][cords[1]] = object;
     });
+  }
+
+  void attemptMove(List<int> cords) {
+    // col, row
+    var map = Provider.of<GameScreenProvider>(context, listen: false).map;
+    if (playerCords[0] + 1 == cords[0] ||
+        playerCords[0] - 1 == cords[0] ||
+        playerCords[0] == cords[0]) {
+      if (playerCords[1] + 1 == cords[1] ||
+          playerCords[1] - 1 == cords[1] ||
+          playerCords[1] == cords[1]) {
+        if (map[cords[0]][cords[1]] == MapObject.none) {
+          setMapObject(cords, MapObject.player, oldCords: playerCords);
+          playerCords = cords;
+        } else if (map[cords[0]][cords[1]] == MapObject.preRunShop) {
+          showModalBottomSheet(
+              context: context,
+              builder: (ctx) =>
+                  PreRunShopScreen(game: _game, stateSetter: emptyStateSetter));
+        } else if (map[cords[0]][cords[1]] == MapObject.dungeonEnterance) {
+          setState(() {
+            enterFloor(1, map);
+            _game.startGame();
+            inputs = [
+              PlayerInputData(
+                  inputText: 'SALDIR',
+                  inputIcon: Icons.arrow_upward_outlined,
+                  inputAction: playerAttack),
+              PlayerInputData(
+                  inputText: 'KONTROL',
+                  inputIcon: Icons.check_box_outlined,
+                  inputAction: checkEnemy),
+              PlayerInputData(
+                  inputText: 'KAÇ',
+                  inputIcon: Icons.run_circle_outlined,
+                  inputAction: playerEscape)
+            ];
+          });
+        }
+      }
+    }
   }
 
   void playerAttack() {
@@ -243,12 +324,12 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void beginGame() {
-    setState(() {
-      context.read<GameScreenProvider>().setUpMap();
-      setMapObject([4, 2], MapObject.player);
-      setMapObject([0, 2], MapObject.dungeonEnterance);
-      setMapObject([3, 2], MapObject.preRunShop);
-    });
+    context.read<GameScreenProvider>().setUpMap();
+    inputs = [];
+    playerCords = [2, 4];
+    setMapObject(playerCords, MapObject.player);
+    setMapObject([2, 0], MapObject.dungeonEnterance);
+    setMapObject([1, 2], MapObject.preRunShop);
   }
 
   @override
@@ -273,7 +354,7 @@ class _GameScreenState extends State<GameScreen> {
                 int row = index ~/ 5;
                 int col = index % 5;
 
-                mapIcon = Icons.abc;
+                mapIcon = Icons.error;
 
                 if (map[col][row] == MapObject.none) {
                   mapIcon = null;
@@ -283,12 +364,19 @@ class _GameScreenState extends State<GameScreen> {
                   mapIcon = Icons.arrow_downward_outlined;
                 } else if (map[col][row] == MapObject.dungeonEnterance) {
                   mapIcon = Icons.door_sliding_outlined;
+                } else if (map[col][row] == MapObject.preRunShop) {
+                  mapIcon = Icons.shopping_cart_outlined;
                 }
 
                 return Container(
                   decoration: BoxDecoration(border: Border.all()),
-                  child: Center(
-                    child: Icon(mapIcon),
+                  child: ButtonTheme(
+                    minWidth: double.infinity,
+                    child: TextButton(
+                        onPressed: () {
+                          attemptMove([col, row]);
+                        },
+                        child: Icon(mapIcon)),
                   ),
                 );
               }),
