@@ -239,6 +239,8 @@ class _GameScreenState extends State<GameScreen> {
     }
     if (!_game.enemyAlive) {
       bool exitBuilt = false;
+      // ignore: unused_local_variable
+      bool mageBuilt = false;
       int stores = 0;
       int treasures = 0;
 
@@ -249,8 +251,8 @@ class _GameScreenState extends State<GameScreen> {
         for (var element in map) {
           // ignore: unused_local_variable
           for (var square in element) {
-            int randomNumber = randomizer.nextInt(6);
-            if (randomNumber == 0 || randomNumber == 1) {
+            int randomNumber = randomizer.nextInt(11);
+            if (randomNumber <= 3) {
               setMapObject([currentCords[0], currentCords[1]], MapObject.enemy);
             } else if ((randomNumber == 2 || currentCords == [4, 4]) &&
                 !exitBuilt &&
@@ -258,13 +260,16 @@ class _GameScreenState extends State<GameScreen> {
               setMapObject(
                   [currentCords[0], currentCords[1]], MapObject.floorLadder);
               exitBuilt = true;
-            } else if (randomNumber == 3 && !(stores >= 3)) {
+            } else if (randomNumber <= 5 && !(stores >= 3)) {
               stores++;
               setMapObject([currentCords[0], currentCords[1]], MapObject.shop);
-            } else if (randomNumber == 4 && !(treasures >= 3)) {
+            } else if (randomNumber <= 7 && !(treasures >= 3)) {
               treasures++;
               setMapObject(
                   [currentCords[0], currentCords[1]], MapObject.treasure);
+            } else if (randomNumber == 8 && !mageBuilt) {
+              mageBuilt = true;
+              setMapObject([currentCords[0], currentCords[1]], MapObject.mage);
             } else {
               setMapObject([currentCords[0], currentCords[1]], MapObject.none);
             }
@@ -374,6 +379,8 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void beginGame() {
+    context.read<GameScreenProvider>().clearMessages();
+    context.read<GameScreenProvider>().map.clear();
     context.read<GameScreenProvider>().setUpMap();
     inputs = [];
     playerCords = [2, 4];
@@ -421,6 +428,8 @@ class _GameScreenState extends State<GameScreen> {
                   mapIcon = Icons.keyboard_double_arrow_up_sharp;
                 } else if (map[col][row] == MapObject.treasure) {
                   mapIcon = Icons.diamond_outlined;
+                } else if (map[col][row] == MapObject.mage) {
+                  mapIcon = Icons.ac_unit_outlined;
                 }
 
                 return Container(
