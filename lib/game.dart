@@ -16,6 +16,7 @@ enum Event { battle, shop, treasure, none }
 enum Buff { invisible, mad, immortalityActivated, firebolt }
 
 enum MapObject {
+  mage,
   player,
   enemy,
   shop,
