@@ -1,5 +1,6 @@
 import 'package:dnd_scuffed/game_objects/items.dart';
 import 'package:dnd_scuffed/game.dart';
+import 'package:dnd_scuffed/game_objects/spells.dart';
 import 'package:dnd_scuffed/providers/game_screen_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -40,6 +41,7 @@ class PlayerData {
     ItemIDs.ancientKey: 0,
     ItemIDs.doubleEdgedHorn: 0
   };
+  List<SpellID> spells = [];
 
   void revivePlayer() {
     health = maxHealth;
@@ -48,6 +50,8 @@ class PlayerData {
   }
 
   void resetplayer() {
+    spells.clear();
+    spells.add(SpellID.smallHeal);
     deathCount = 0;
     damageMultiplier = 1;
     maxHunger = 100;
