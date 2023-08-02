@@ -385,7 +385,6 @@ class _GameScreenState extends State<GameScreen> {
   @override
   Widget build(BuildContext context) {
     List<String> allMessages = context.watch<GameScreenProvider>().chatLog;
-    // ignore: unused_local_variable
     List<List<MapObject>> map = context.watch<GameScreenProvider>().map;
     List<Widget> botMessages = [];
     for (String message in allMessages) {
