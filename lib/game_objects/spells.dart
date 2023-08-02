@@ -1,7 +1,5 @@
 import 'package:dnd_scuffed/game.dart';
 
-//TODO: Add mana usage to spell casts.
-
 enum SpellID { smallHeal, mediumHeal, largeHeal, firebolt, icebolt }
 
 class Spell {
