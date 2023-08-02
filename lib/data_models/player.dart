@@ -113,6 +113,10 @@ class PlayerData {
     mana += 20 * level;
   }
 
+  void useMana(int amount) {
+    mana -= amount;
+  }
+
   void takeDamage(int amount, game) {
     health -= amount;
 

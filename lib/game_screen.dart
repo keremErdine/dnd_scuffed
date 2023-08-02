@@ -102,13 +102,15 @@ class _GameScreenState extends State<GameScreen> {
   void openChest(void Function(Game) execute) {
     setState(() {
       execute(_game);
-      inputs.removeAt(0);
+      _game.inEvent = false;
+      inputs.clear();
     });
   }
 
   void spawnTreasure(List<int> treasureCords) {
     setState(() {
       _game.spawnChest();
+      _game.inEvent = true;
       inputs.insert(
           0,
           PlayerInputData(
@@ -133,6 +135,7 @@ class _GameScreenState extends State<GameScreen> {
                 setState(() {
                   setMapObject(treasureCords, MapObject.none);
                   inputs.clear();
+                  _game.inEvent = false;
                 });
               }));
     });
@@ -228,7 +231,7 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void enterFloor(int floor, List<List<MapObject>> map) {
-    if (floor == 10) {
+    if (floor == 6) {
       _game.addMessage('Bir yaratık yaklaşıyor! Dikkat et!');
       summonFloorBoss(EnemyIDs.windigo);
       _game.addMessage(

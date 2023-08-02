@@ -13,7 +13,7 @@ enum Turn { player, enemy, none }
 
 enum Event { battle, shop, treasure, none }
 
-enum Buff { invisible, mad, immortalityActivated }
+enum Buff { invisible, mad, immortalityActivated, firebolt }
 
 enum MapObject {
   player,
@@ -49,6 +49,7 @@ class Game {
   var daysSurvivedIcon = Icons.calendar_month_outlined;
   bool affordsPreRunBuffes = false;
   List<int>? currentEnemyCords;
+  bool inEvent = false;
 
   /*
   void setSharedPreferances() async {
@@ -268,6 +269,11 @@ class Game {
         addMessage(
             'AAARGH! Deli olduğundan hasarın 5 kat arttı! Ama etkisi geçiyor...');
       }
+      if (activeBuffes.contains(Buff.firebolt)) {
+        activeBuffes.remove(Buff.firebolt);
+        addMessage('Ateştopunu düşmanına fırlattın!');
+      }
+      player.damageMultiplier = 1;
       if (randomizer.nextInt(100) < (10 - player.accuracy)) {
         addMessage(
             'ISKALADIN! Bunun için $hungerLoss açlık puanı kaybettin. Ama tutarlığın 1 arttı.');

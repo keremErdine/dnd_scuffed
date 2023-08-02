@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:dnd_scuffed/widgets/inventory_screen.dart';
 import 'package:dnd_scuffed/data_models/player_input_data.dart';
 import 'package:dnd_scuffed/game_objects/items.dart';
+import 'package:dnd_scuffed/widgets/spells_screen.dart';
 
 class PlayerInputs extends StatelessWidget {
   const PlayerInputs(
@@ -44,6 +45,21 @@ class PlayerInputs extends StatelessWidget {
                       return InventoryScreen(
                         stateSetter: stateSetter,
                         playerInventory: playerInventory,
+                        game: game,
+                      );
+                    },
+                  );
+                },
+              ),
+              InputModel(
+                inputIcon: Icons.book_outlined,
+                inputText: 'BÜYÜLER',
+                inputAction: () {
+                  showModalBottomSheet(
+                    context: context,
+                    builder: (ctx) {
+                      return SpellsScreen(
+                        stateSetter: stateSetter,
                         game: game,
                       );
                     },

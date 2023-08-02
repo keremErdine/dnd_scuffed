@@ -118,7 +118,7 @@ Map<ItemIDs, Item> items = {
     description: 'HAARGGH! Delir ve hasarını bir turluğuna 5 katına çıkar.',
     itemAction: (game) {
       game.activeBuffes.add(Buff.mad);
-      game.player.damageMultiplier = 5;
+      game.player.damageMultiplier * 5;
       game.addMessage(
           'HAAAAAAAARGH! ÇOK KIZGINIM! Hasarın bir turluğuna 5 katına çıktı!');
     },
