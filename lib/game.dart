@@ -24,7 +24,9 @@ enum MapObject {
   preRunShop,
   floorLadder,
   dungeonEnterance,
-  none
+  none,
+  restartGate,
+  reviveGate
 }
 
 class Game {
@@ -51,6 +53,7 @@ class Game {
   bool affordsPreRunBuffes = false;
   List<int>? currentEnemyCords;
   bool inEvent = false;
+  bool playerDead = false;
 
   /*
   void setSharedPreferances() async {

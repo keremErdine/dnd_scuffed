@@ -294,17 +294,14 @@ class _GameScreenState extends State<GameScreen> {
         playerEscape();
         _game.player.hunger = _game.player.maxHunger;
       } else if (_game.player.health <= 0) {
-        inputs = [
-          PlayerInputData(
-            inputText: 'TEKRAR',
-            inputIcon: Icons.fast_rewind_outlined,
-            inputAction: beginGame,
-          ),
-          PlayerInputData(
-              inputText: 'DEVAM',
-              inputIcon: Icons.fast_forward_outlined,
-              inputAction: revivePlayer)
-        ];
+        _game.playerDead = true;
+        context.read<GameScreenProvider>().map.clear();
+        context.read<GameScreenProvider>().setUpMap();
+        inputs.clear();
+        playerCords = [2, 4];
+        setMapObject(playerCords, MapObject.player);
+        setMapObject([4, 2], MapObject.restartGate);
+        setMapObject([0, 2], MapObject.reviveGate);
       }
     });
   }
@@ -313,12 +310,7 @@ class _GameScreenState extends State<GameScreen> {
     setState(() {
       _game.activePreRunBuffs.clear();
       _game.revivePlayer();
-      inputs = [
-        PlayerInputData(
-            inputText: 'DEVAM',
-            inputIcon: Icons.forward_rounded,
-            inputAction: continueGame)
-      ];
+      enterFloor(_game.currentFloor, context.read<GameScreenProvider>().map);
     });
   }
 
@@ -372,6 +364,11 @@ class _GameScreenState extends State<GameScreen> {
         } else if (map[cords[0]][cords[1]] == MapObject.mage) {
           _game.inEvent = true;
           spawnMage([cords[0], cords[1]]);
+        } else if (map[cords[0]][cords[1]] == MapObject.restartGate) {
+          _game.player.resetplayer();
+          beginGame();
+        } else if (map[cords[0]][cords[1]] == MapObject.reviveGate) {
+          revivePlayer();
         }
       }
     }
@@ -381,7 +378,7 @@ class _GameScreenState extends State<GameScreen> {
     setState(() {
       _game.addMessage('Bir büyücüye geldin!');
       inputs.add(PlayerInputData(
-          inputText: 'BÜYÜ DERSİ',
+          inputText: 'BÜYÜCÜ',
           inputIcon: Icons.ac_unit_outlined,
           inputAction: enterMage));
       inputs.add(PlayerInputData(
@@ -469,6 +466,10 @@ class _GameScreenState extends State<GameScreen> {
                   mapIcon = Icons.diamond_outlined;
                 } else if (map[col][row] == MapObject.mage) {
                   mapIcon = Icons.ac_unit_outlined;
+                } else if (map[col][row] == MapObject.restartGate) {
+                  mapIcon = Icons.door_sliding_outlined;
+                } else if (map[col][row] == MapObject.reviveGate) {
+                  mapIcon = Icons.medication;
                 }
 
                 return Container(
