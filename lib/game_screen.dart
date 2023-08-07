@@ -398,6 +398,7 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void enterMage() {
+    //TODO: Implement mage.
     setState(() {
       showModalBottomSheet(
           context: context,
