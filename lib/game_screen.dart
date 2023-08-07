@@ -93,6 +93,7 @@ class _GameScreenState extends State<GameScreen> {
               inputAction: () {
                 setState(() {
                   setMapObject(cords, MapObject.none);
+                  _game.inEvent = false;
                   inputs.clear();
                 });
               }));
@@ -254,7 +255,7 @@ class _GameScreenState extends State<GameScreen> {
             int randomNumber = randomizer.nextInt(11);
             if (randomNumber <= 3) {
               setMapObject([currentCords[0], currentCords[1]], MapObject.enemy);
-            } else if ((randomNumber == 2 || currentCords == [4, 4]) &&
+            } else if ((randomNumber == 4 || currentCords == [4, 4]) &&
                 !exitBuilt &&
                 currentCords != [4, 2]) {
               setMapObject(
@@ -267,10 +268,11 @@ class _GameScreenState extends State<GameScreen> {
               treasures++;
               setMapObject(
                   [currentCords[0], currentCords[1]], MapObject.treasure);
-            } else if (randomNumber == 8 && !mageBuilt) {
-              mageBuilt = true;
-              setMapObject([currentCords[0], currentCords[1]], MapObject.mage);
-            } else {
+            } //else if (randomNumber == 8 && !mageBuilt) {
+            //mageBuilt = true;
+            //setMapObject([currentCords[0], currentCords[1]], MapObject.mage);
+            //}
+            else {
               setMapObject([currentCords[0], currentCords[1]], MapObject.none);
             }
             currentCords[1]++;
@@ -336,7 +338,8 @@ class _GameScreenState extends State<GameScreen> {
     if ((playerCords[0] + 1 == cords[0] ||
             playerCords[0] - 1 == cords[0] ||
             playerCords[0] == cords[0]) &&
-        !_game.enemyAlive) {
+        !_game.enemyAlive &&
+        !_game.inEvent) {
       if (playerCords[1] + 1 == cords[1] ||
           playerCords[1] - 1 == cords[1] ||
           playerCords[1] == cords[1]) {
@@ -359,8 +362,10 @@ class _GameScreenState extends State<GameScreen> {
           spawnEnemy();
         } else if (map[cords[0]][cords[1]] == MapObject.treasure) {
           spawnTreasure([cords[0], cords[1]]);
+          _game.inEvent = true;
         } else if (map[cords[0]][cords[1]] == MapObject.shop) {
           spawnShop([cords[0], cords[1]]);
+          _game.inEvent = true;
         } else if (map[cords[0]][cords[1]] == MapObject.floorLadder) {
           _game.currentFloor++;
           enterFloor(_game.currentFloor, map);
