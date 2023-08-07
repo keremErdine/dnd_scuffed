@@ -24,7 +24,9 @@ enum MapObject {
   preRunShop,
   floorLadder,
   dungeonEnterance,
-  none
+  none,
+  restartGate,
+  reviveGate
 }
 
 class Game {
