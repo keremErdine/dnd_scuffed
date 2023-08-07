@@ -1,4 +1,5 @@
 import 'dart:js_interop';
+import 'package:dnd_scuffed/widgets/mage_screen.dart';
 
 import 'package:dnd_scuffed/data_models/enemy_data.dart';
 import 'package:dnd_scuffed/data_models/player_input_data.dart';
@@ -377,24 +378,34 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void spawnMage(List<int> mageCords) {
-    _game.addMessage('Bir büyücüye geldin!');
-    inputs.add(PlayerInputData(
-        inputText: 'BÜYÜ DERSİ',
-        inputIcon: Icons.ac_unit_outlined,
-        inputAction: learnMagic));
-    inputs.add(PlayerInputData(
-        inputText: 'DEVAM',
-        inputIcon: Icons.arrow_right_alt_outlined,
-        inputAction: () {
-          setState(() {
-            setMapObject(mageCords, MapObject.none);
-            inputs.clear();
-            _game.inEvent = false;
-          });
-        }));
+    setState(() {
+      _game.addMessage('Bir büyücüye geldin!');
+      inputs.add(PlayerInputData(
+          inputText: 'BÜYÜ DERSİ',
+          inputIcon: Icons.ac_unit_outlined,
+          inputAction: enterMage));
+      inputs.add(PlayerInputData(
+          inputText: 'DEVAM',
+          inputIcon: Icons.arrow_right_alt_outlined,
+          inputAction: () {
+            setState(() {
+              setMapObject(mageCords, MapObject.none);
+              inputs.clear();
+              _game.inEvent = false;
+            });
+          }));
+    });
   }
 
-  void learnMagic() {}
+  void enterMage() {
+    setState(() {
+      showModalBottomSheet(
+          context: context,
+          builder: (ctx) {
+            return const MageScreen();
+          });
+    });
+  }
 
   void playerAttack() {
     setState(() {
