@@ -75,6 +75,8 @@ class Game {
     context.read<GameScreenProvider>().addMessage(message);
   }
 
+  void spawnMage() {}
+
   void spawnShop() {
     int shopRarityDecider = randomizer.nextInt(100) + 1;
     ShopRarity shopRarity = ShopRarity.common;

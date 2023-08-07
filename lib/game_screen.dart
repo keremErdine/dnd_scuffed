@@ -268,11 +268,10 @@ class _GameScreenState extends State<GameScreen> {
               treasures++;
               setMapObject(
                   [currentCords[0], currentCords[1]], MapObject.treasure);
-            } //else if (randomNumber == 8 && !mageBuilt) {
-            //mageBuilt = true;
-            //setMapObject([currentCords[0], currentCords[1]], MapObject.mage);
-            //}
-            else {
+            } else if (randomNumber == 8 && !mageBuilt) {
+              mageBuilt = true;
+              setMapObject([currentCords[0], currentCords[1]], MapObject.mage);
+            } else {
               setMapObject([currentCords[0], currentCords[1]], MapObject.none);
             }
             currentCords[1]++;
@@ -369,10 +368,33 @@ class _GameScreenState extends State<GameScreen> {
         } else if (map[cords[0]][cords[1]] == MapObject.floorLadder) {
           _game.currentFloor++;
           enterFloor(_game.currentFloor, map);
+        } else if (map[cords[0]][cords[1]] == MapObject.mage) {
+          _game.inEvent = true;
+          spawnMage([cords[0], cords[1]]);
         }
       }
     }
   }
+
+  void spawnMage(List<int> mageCords) {
+    _game.addMessage('Bir büyücüye geldin!');
+    inputs.add(PlayerInputData(
+        inputText: 'BÜYÜ DERSİ',
+        inputIcon: Icons.ac_unit_outlined,
+        inputAction: learnMagic));
+    inputs.add(PlayerInputData(
+        inputText: 'DEVAM',
+        inputIcon: Icons.arrow_right_alt_outlined,
+        inputAction: () {
+          setState(() {
+            setMapObject(mageCords, MapObject.none);
+            inputs.clear();
+            _game.inEvent = false;
+          });
+        }));
+  }
+
+  void learnMagic() {}
 
   void playerAttack() {
     setState(() {
