@@ -316,7 +316,7 @@ class _GameScreenState extends State<GameScreen> {
 
   void setMapObject(List<int> cords, MapObject object, {List<int>? oldCords}) {
     setState(() {
-      if (!oldCords.isNull) {
+      if (oldCords == null) {
         context.read<GameScreenProvider>().map[oldCords![0]][oldCords[1]] =
             MapObject.none;
       }

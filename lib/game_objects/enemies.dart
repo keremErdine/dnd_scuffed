@@ -17,7 +17,19 @@ class Enemy {
 
 enum EnemyType { normal, boss, floorBoss }
 
-enum EnemyIDs { goblin, wolf, zombie, earthGolem, undeadKnight, windigo }
+enum EnemyIDs {
+  goblin,
+  wolf,
+  zombie,
+  earthGolem,
+  undeadKnight,
+  windigo,
+  skeletonArcher,
+  armoredZombie,
+  bandit,
+  exiled,
+  sugomabot
+}
 
 Map<EnemyIDs, Enemy> enemies = {
   EnemyIDs.goblin: Enemy(
@@ -57,5 +69,37 @@ Map<EnemyIDs, Enemy> enemies = {
       enemyDescription:
           'Ağaçların arasından çıkan ve insan yiyen bir yaratık. Sonraki kata geçmek için öldür.',
       type: EnemyType.floorBoss,
-      drops: [ItemIDs.doubleEdgedHorn])
+      drops: [ItemIDs.doubleEdgedHorn]),
+  EnemyIDs.skeletonArcher: Enemy(
+      enemyName: 'İskelet Okçu',
+      enemyLevel: 9,
+      enemyDescription: 'Yayı olan bir iskelet. Bana bir şeyi hatırlatıyor.',
+      type: EnemyType.normal,
+      drops: [ItemIDs.goldKey, ItemIDs.mediumHealthPotion]),
+  EnemyIDs.armoredZombie: Enemy(
+      enemyName: 'Zırhlı Zombi',
+      enemyLevel: 12,
+      enemyDescription:
+          'Bu zombi, normal bir zombiden daha güçlü çünkü zırhlı.',
+      type: EnemyType.normal,
+      drops: [ItemIDs.pie, ItemIDs.largeHealthPotion]),
+  EnemyIDs.bandit: Enemy(
+      enemyName: 'Haydut',
+      enemyLevel: 14,
+      enemyDescription: 'Silahlı bir kanunsuz. Adam sağlam yani.',
+      type: EnemyType.normal,
+      drops: [ItemIDs.goldKey, ItemIDs.largeHealthPotion]),
+  EnemyIDs.exiled: Enemy(
+      enemyName: 'Sürgün',
+      enemyLevel: 20,
+      enemyDescription:
+          'Ülkesinden sürülmüş bir savaşçı. Önüne çıkan herkesi öldürür.',
+      type: EnemyType.floorBoss,
+      drops: [ItemIDs.totemOfMadness]),
+  EnemyIDs.sugomabot: Enemy(
+      enemyName: 'SUGOMABOT',
+      enemyLevel: 125,
+      enemyDescription: 'Çok affedersin ama oyunu bitiremezsin.',
+      type: EnemyType.floorBoss,
+      drops: []),
 };
